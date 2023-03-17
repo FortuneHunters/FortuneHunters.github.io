@@ -25,16 +25,68 @@
           <div class="pt-1"><strong>- 0% Claim fee</strong></div>
           <div class="pt-1"><strong>- 0% Roll fee</strong></div>
           <div class="pt-1"><strong>- Locked deposits</strong></div>
-          <div class="pt-1"><strong>- 0-200% reward factor on every roll of rewards</strong></div>
-          <div class="pl-2"><i>Example</i>: You have collected 1 BNB in rewards. When rolling for rewards, you get a 120% reward factor - the rewards you can claim are now 1.2 BNB.</div>
-          <div class="pt-1"><strong>- Roll and re-roll up to 3 times for potentially better reward factor</strong></div>
-          <div class="pl-2"><i>Example</i>: You rolled a reward factor of 35% which you aren't satisfied with. You can re-roll to potentially get a better result.</div>
+          <div class="pt-1">
+            <strong>- 50%-200% reward factor on every roll of rewards</strong>
+          </div>
+          <div class="pl-2">
+            <i>Example</i>: You have collected 1 BNB in rewards. When rolling
+            for rewards, you get a 120% reward factor - the rewards you can
+            claim or compound are now 1.2 BNB.
+          </div>
+          <div class="pt-1">
+            <strong
+              >- Roll and re-roll up to 3 times for potentially better reward
+              factor</strong
+            >
+          </div>
+          <div class="pl-2">
+            <i>Example</i>: You rolled a reward factor of 35% which you aren't
+            satisfied with. You can re-roll to potentially get a better result.
+          </div>
+          <div class="pl-2">
+            First roll is free, second and third will cost 0.2% of the pending
+            rewards in service fee.
+          </div>
           <div class="pl-2">Your last roll is the one that counts.</div>
           <div class="pl-2">You cannot choose the best of each roll.</div>
-          <div class="pl-2">Once you roll, your available rewards stops accumulating.</div>
-          <div class="py-2 pt-3"><h3><strong>- ROI? Who knows...</strong></h3></div>
-          <div class="pt-2"><strong>- 20% of remaining rewards goes to the team if rolls lands under 100% are claimed</strong></div>
-          <div class="pl-2"><i>Example</i>: You rolled a reward factor of 50% of a reward amount of 1 BNB on your third try and you need to claim this amount. You will get 0.5 BNB. 20% of the remaining, the other 0.5 BNB, will go to the team. So the team receives 20% of 0.5 BNB = 0.1 BNB.</div>
+          <div class="pl-2">
+            Once you roll, your available rewards stops accumulating.
+          </div>
+          <div class="py-2 pt-3">
+            <h3><strong>- ROI? Who knows...</strong></h3>
+          </div>
+          <div class="py-2 pt-3">
+            <h4>
+              <strong
+                >- Every amount claimed will be deducted from your TVL</strong
+              >
+            </h4>
+          </div>
+          <div class="pt-2">
+            <strong
+              >- 40% of remaining rewards goes to a revenue stream if
+              claimed/compounded rolls lands under 100%</strong
+            >
+          </div>
+          <div class="pt-2">
+            <strong
+              >- 10% of remaining rewards goes to the team if claimed/compounded
+              rolls lands under 100%</strong
+            >
+          </div>
+          <div class="pt-2">
+            <strong
+              >- You can never withdraw more than your TVL - regardless of
+              rewards and reward factor</strong
+            >
+          </div>
+          <div class="pl-2">
+            <i>Example</i>: You rolled a reward factor of 50% of a reward amount
+            of 1 BNB on your third try and you need to claim/compound this
+            amount. You will get 0.5 BNB. 20% of the remaining, the other 0.5
+            BNB, will go to the team. So the team receives 20% of 0.5 BNB = 0.1
+            BNB.
+          </div>
 
           <div id="prepare" class="pt-4 text-center">
             <button class="btn btnprimary" id="btn-connect">
@@ -79,10 +131,25 @@
               <button class="btn btnprimary" id="btn-deposit">Deposit</button>
             </div>
             <div class="pt-4 w-50">
+              <div id="roll-fee" class="form-group w-50">
+                <label for="deposit-input">Add 0.2% of pending rewards:</label>
+                <input
+                  id="deposit-fee-input"
+                  p
+                  laceholder="...bnb"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
               <button class="btn btnsecondary" id="btn-roll-rewards">
                 Roll rewards
               </button>
+            </div>
+            <div class="pt-4 w-50">
               <button class="btn btnsecondary" id="btn-claim">Claim</button>
+              <button class="btn btnsecondary" id="btn-compound">
+                Compound
+              </button>
             </div>
             <div id="random-reward-picker" class="pt-4 text-center">
               <h4>Choosing random reward percentage. Please wait...</h4>

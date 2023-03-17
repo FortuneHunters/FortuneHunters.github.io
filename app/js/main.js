@@ -23,7 +23,7 @@ const testnet = "https://data-seed-prebsc-1-s1.binance.org:8545";
 const MAINNET_RPC_URL = testnet;
 
 const contractMainnet = "";
-const contractTestnet = "0xC18fc9B450F980eEF3d1bb0D434B115845ec2aae";
+const contractTestnet = "0x975029204D954474F6664C2FE8d0e7E8a3354a23";
 const contract = contractTestnet;
 
 /**
@@ -35,7 +35,10 @@ function init() {
   document.querySelector("#connected").style.display = "none";
   document.querySelector("#random-reward-picker").style.display = "none";
   document.querySelector("#btn-claim").setAttribute("disabled", "disabled");
-  document.querySelector("#btn-claim").style.display = "none"
+  document.querySelector("#btn-claim").style.display = "none";
+  document.querySelector("#btn-compound").setAttribute("disabled", "disabled");
+  document.querySelector("#btn-compound").style.display = "none";
+  document.querySelector("#roll-fee").style.display = "none";
 
   // Tell Web3modal what providers we have available.
   // Built-in web browser provider (only one can exist as a time)
@@ -61,13 +64,13 @@ const getContract = () => {
 };
 
 function truncateAddress(address) {
-    if (address) {
-      const first4 = address.slice(0, 5);
-      const last4 = address.slice(address.length - 5);
-      return `${first4} ... ${last4}`;
-    }
-    return null;
+  if (address) {
+    const first4 = address.slice(0, 5);
+    const last4 = address.slice(address.length - 5);
+    return `${first4} ... ${last4}`;
   }
+  return null;
+}
 
 /**
  * Kick in the UI action after Web3modal dialog has chosen a provider
@@ -85,7 +88,8 @@ async function fetchAccountData() {
   console.log("Got accounts", accounts);
   selectedAccount = accounts[0];
 
-  document.querySelector("#selected-account").textContent = truncateAddress(selectedAccount);
+  document.querySelector("#selected-account").textContent =
+    truncateAddress(selectedAccount);
 
   // Get a handl
   const template = document.querySelector("#template-balance");
@@ -99,8 +103,14 @@ async function fetchAccountData() {
     const balance = await web3Instance.eth.getBalance(address);
     const user = await getUser();
     if (Number(user.rollAttempts) > 0) {
-        document.querySelector("#btn-claim").removeAttribute("disabled");
-        document.querySelector("#btn-claim").style.display = "block"
+      document.querySelector("#btn-claim").removeAttribute("disabled");
+      document.querySelector("#btn-claim").style.display = "block";
+      document.querySelector("#btn-compound").removeAttribute("disabled");
+      document.querySelector("#btn-compound").style.display = "block";
+    }
+
+    if (Number(user.rollAttempts) > 1) {
+      document.querySelector("#roll-fee").style.display = "block";
     }
     const rewardsAvailable = await getAvailableRewards();
     // ethBalance is a BigNumber instance
@@ -109,11 +119,13 @@ async function fetchAccountData() {
     const humanFriendlyBalance = parseFloat(ethBalance).toFixed(4);
     // Fill in the templated row and put in the document
     const clone = template.content.cloneNode(true);
-    clone.querySelector(".totalDeposit").textContent = web3Instance.utils.fromWei(user.totalDeposit, "ether");
-    clone.querySelector(".availableRewards").textContent = web3Instance.utils.fromWei(rewardsAvailable, "ether");
+    clone.querySelector(".totalDeposit").textContent =
+      web3Instance.utils.fromWei(user.totalDeposit, "ether");
+    clone.querySelector(".availableRewards").textContent =
+      web3Instance.utils.fromWei(rewardsAvailable, "ether");
     clone.querySelector(".rollAttempts").textContent = user.rollAttempts;
     clone.querySelector(".lastRolledRewards").textContent =
-    clone.querySelector(".availableRewards").textContent = web3Instance.utils.fromWei(user.lastRolledRewards, "ether");
+      web3Instance.utils.fromWei(user.lastRolledRewards, "ether");
     accountContainer.appendChild(clone);
   });
 
@@ -208,14 +220,18 @@ async function onConnect() {
 
 function disableButtons() {
   document.querySelector("#btn-deposit").setAttribute("disabled", "disabled");
-  document.querySelector("#btn-roll-rewards").setAttribute("disabled", "disabled");
+  document
+    .querySelector("#btn-roll-rewards")
+    .setAttribute("disabled", "disabled");
   document.querySelector("#btn-claim").setAttribute("disabled", "disabled");
+  document.querySelector("#btn-compound").setAttribute("disabled", "disabled");
 }
 
 function enableButtons() {
   document.querySelector("#btn-deposit").removeAttribute("disabled");
   document.querySelector("#btn-roll-rewards").removeAttribute("disabled");
   document.querySelector("#btn-claim").removeAttribute("disabled");
+  document.querySelector("#btn-compound").removeAttribute("disabled");
 }
 
 /**
@@ -317,6 +333,29 @@ async function onClaim() {
     });
 }
 
+async function onCompound() {
+  document.querySelector("#btn-compound").innerHTML = "Compounding..";
+  disableButtons();
+
+  const contract = getContract();
+  return await contract.methods
+    .compound()
+    .send({
+      from: selectedAccount,
+    })
+    .then(async (res) => {
+      console.log("Success", res);
+      document.querySelector("#btn-compound").innerHTML = "Compound";
+      await refreshAccountData();
+      enableButtons();
+    })
+    .catch((err) => {
+      console.log(err);
+      document.querySelector("#btn-compound").innerHTML = "Compound";
+      enableButtons();
+    });
+}
+
 /**
  * Main entry point.
  */
@@ -330,6 +369,7 @@ window.addEventListener("load", async () => {
     .addEventListener("click", onRollRewards);
 
   document.querySelector("#btn-claim").addEventListener("click", onClaim);
+  document.querySelector("#btn-compound").addEventListener("click", onCompound);
 });
 
 // Use requestAnimationFrame with setTimeout fallback
@@ -355,4 +395,4 @@ var percentEl = document.querySelector(".percent");
   }, 100);
 })();
 
-const ABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Claimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Deposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"attempts","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rewards","type":"uint256"}],"name":"RolledRewards","type":"event"},{"inputs":[{"internalType":"address","name":"adr","type":"address"}],"name":"availableRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"deposit","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"initialized","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rollRewards","outputs":[{"internalType":"uint256","name":"attemps","type":"uint256"},{"internalType":"uint256","name":"rewards","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"users","outputs":[{"internalType":"address","name":"adr","type":"address"},{"internalType":"uint256","name":"totalDeposit","type":"uint256"},{"internalType":"uint256","name":"depositedAt","type":"uint256"},{"internalType":"uint256","name":"claimedAt","type":"uint256"},{"internalType":"uint256","name":"lastRolledRewards","type":"uint256"},{"internalType":"uint256","name":"lastRolledNr","type":"uint256"},{"internalType":"uint256","name":"rollAttempts","type":"uint256"}],"stateMutability":"view","type":"function"}];
+const ABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Claimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Compounded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Deposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"attempts","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rewards","type":"uint256"}],"name":"RolledRewards","type":"event"},{"inputs":[{"internalType":"address","name":"adr","type":"address"}],"name":"availableRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"compound","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"deposit","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"initialized","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rollRewards","outputs":[{"internalType":"uint256","name":"attemps","type":"uint256"},{"internalType":"uint256","name":"rewards","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"users","outputs":[{"internalType":"address","name":"adr","type":"address"},{"internalType":"uint256","name":"totalDeposit","type":"uint256"},{"internalType":"uint256","name":"depositedAt","type":"uint256"},{"internalType":"uint256","name":"claimedAt","type":"uint256"},{"internalType":"uint256","name":"compoundedAt","type":"uint256"},{"internalType":"uint256","name":"lastRolledRewards","type":"uint256"},{"internalType":"uint256","name":"lastRolledNr","type":"uint256"},{"internalType":"uint256","name":"rollAttempts","type":"uint256"}],"stateMutability":"view","type":"function"}]
