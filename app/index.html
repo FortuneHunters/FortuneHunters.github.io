@@ -1,0 +1,130 @@
+<html>
+  <head>
+    <title>Simple vanilla JS example of Web3modal usage</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Get some bootstrap default styles -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Construct a Bootstrap layout -->
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Reward Sniper</h1>
+          <div class="pt-1"><strong>- 1% Daily rewards</strong></div>
+          <div class="pt-1"><strong>- 0% Deposit fee</strong></div>
+          <div class="pt-1"><strong>- 0% Claim fee</strong></div>
+          <div class="pt-1"><strong>- 0% Roll fee</strong></div>
+          <div class="pt-1"><strong>- Locked deposits</strong></div>
+          <div class="pt-1"><strong>- 0-200% reward factor on every roll of rewards</strong></div>
+          <div class="pl-2"><i>Example</i>: You have collected 1 BNB in rewards. When rolling for rewards, you get a 120% reward factor - the rewards you can claim are now 1.2 BNB.</div>
+          <div class="pt-1"><strong>- Roll and re-roll up to 3 times for potentially better reward factor</strong></div>
+          <div class="pl-2"><i>Example</i>: You rolled a reward factor of 35% which you aren't satisfied with. You can re-roll to potentially get a better result.</div>
+          <div class="pl-2">Your last roll is the one that counts.</div>
+          <div class="pl-2">You cannot choose the best of each roll.</div>
+          <div class="pl-2">Once you roll, your available rewards stops accumulating.</div>
+          <div class="py-2 pt-3"><h3><strong>- ROI? Who knows...</strong></h3></div>
+          <div class="pt-2"><strong>- 20% of remaining rewards goes to the team if rolls lands under 100% are claimed</strong></div>
+          <div class="pl-2"><i>Example</i>: You rolled a reward factor of 50% of a reward amount of 1 BNB on your third try and you need to claim this amount. You will get 0.5 BNB. 20% of the remaining, the other 0.5 BNB, will go to the team. So the team receives 20% of 0.5 BNB = 0.1 BNB.</div>
+
+          <div id="prepare" class="pt-4 text-center">
+            <button class="btn btnprimary" id="btn-connect">
+              Connect wallet
+            </button>
+          </div>
+
+          <div class="pt-4" id="connected" style="display: none">
+            <div id="network">
+              <p>
+                <strong>Selected account:</strong>
+                <span id="selected-account"></span>
+              </p>
+            </div>
+
+            <hr />
+
+            <table class="table table-listing">
+              <thead>
+                <th>Total deposit</th>
+                <th>Rewards awailable</th>
+                <th>Roll attempts</th>
+                <th>Last rolled rewards</th>
+              </thead>
+
+              <tbody id="accounts"></tbody>
+            </table>
+
+            <div>
+              <div id="ref-address" class="form-group w-50">
+                <label for="deposit-input"
+                  >Deposit amount in BNB (no min or max):</label
+                >
+                <input
+                  id="deposit-input"
+                  p
+                  laceholder="...bnb"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
+              <button class="btn btnprimary" id="btn-deposit">Deposit</button>
+            </div>
+            <div class="pt-4 w-50">
+              <button class="btn btnsecondary" id="btn-roll-rewards">
+                Roll rewards
+              </button>
+              <button class="btn btnsecondary" id="btn-claim">Claim</button>
+            </div>
+            <div id="random-reward-picker" class="pt-4 text-center">
+              <h4>Choosing random reward percentage. Please wait...</h4>
+              <div class="percent">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- We use simple <template> templating for the example -->
+    <div id="templates" style="display: none">
+      <template id="template-balance">
+        <tr>
+          <td class="totalDeposit"></td>
+          <td class="availableRewards"></td>
+          <td class="rollAttempts"></td>
+          <td class="lastRolledRewards"></td>
+        </tr>
+      </template>
+    </div>
+
+    <!--
+
+      Use unpkg CDN to load all NPM packages to vanilla Javascript - read more at http://unpkg.com
+
+      On your deployment, you properly either want to use a preprocessing tool like webpack
+      to include these files, or extract NPM archives and manually host the files inside.
+
+      TODO: Pin down all versions.
+
+    -->
+
+    <script src="https://unpkg.com/web3@latest/dist/web3.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/web3modal@1.9.12/dist/index.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/@walletconnect/web3-provider@1.2.1/dist/umd/index.min.js"
+    ></script>
+    <script type="text/javascript" src="./js/main.js"></script>
+  </body>
+</html>
